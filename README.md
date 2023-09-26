@@ -4,7 +4,8 @@
 [![Python supported versions]][pypi]
 [![License]](./LICENSE)
 
-CSXhair is a simple package for decoding/encoding CS:GO (and CS2!) crosshairs using share codes.
+CSXhair is a simple package for decoding/encoding CS:GO (and CS2!) crosshairs using game share codes. \
+All share codes are fully compatible with CS:GO/CS2.
 
 ```python
 from csxhair import Crosshair
