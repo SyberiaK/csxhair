@@ -25,3 +25,5 @@ print(my_crosshair.cs2_commands)  # ['cl_crosshairgap -3.0', ..., 'cl_crosshaird
 [PyPI Release]: https://img.shields.io/pypi/v/csxhair.svg?label=pypi&color=green
 [Python supported versions]: https://img.shields.io/pypi/pyversions/csxhair.svg?label=%20&logo=python&logoColor=white
 [License]: https://img.shields.io/pypi/l/csxhair.svg?style=flat&label=license
+
+*Special thanks to [Aquarius](https://github.com/aquaismissing) for making a rough implementation led to this package.*
