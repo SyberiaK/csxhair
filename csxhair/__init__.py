@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import re
 
-from attrs import define, field, validators
+from attrs import Attribute, define, field, validators
 
-__version__ = '1.0.0'
+
+__version__ = '1.0.1'
 __all__ = ('Crosshair',)
 
 DICTIONARY = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789'
@@ -12,13 +13,13 @@ DICTIONARY_LENGTH = len(DICTIONARY)
 CODE_PATTERN = re.compile(r'CSGO(-[{%s}]{5}){5}$' % DICTIONARY)
 
 
-def signed_byte(x, /) -> int:
+def signed_byte(x: int, /) -> int:
     """Converts an unsigned byte to a signed one."""
 
     return (x ^ 0x80) - 0x80  # https://stackoverflow.com/a/37095855
 
 
-def lowercase_bool(x, /) -> str:
+def lowercase_bool(x: bool, /) -> str:
     """For the sake of values unifying - returns a lowercase string of bool (``'True'`` -> ``'true'``)."""
 
     if type(x) is bool:
@@ -27,10 +28,10 @@ def lowercase_bool(x, /) -> str:
     raise ValueError(f'Expected bool, got {x}')
 
 
-def _validate_bounds(lower_bound, upper_bound, /):
-    def inner(_, attribute, value):
+def _validate_bounds(lower_bound: int | float, upper_bound: int | float, /):
+    def inner(_, attribute: Attribute, value: int):
         if not (lower_bound <= value <= upper_bound):
-            raise ValueError(f"'{attribute}' has to be in range [{lower_bound}; {upper_bound}].")
+            raise ValueError(f"'{attribute.name}' has to be in range [{lower_bound}; {upper_bound}].")
 
     return inner
 
