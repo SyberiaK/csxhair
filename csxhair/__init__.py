@@ -38,7 +38,7 @@ def _round_float(_instance, _attribute, value: float) -> float:
 
 @define
 class Crosshair:
-    """Represents a CS:GO/CS2 crosshair."""
+    """Represents a CS2 crosshair."""
 
     red: int = field(validator=_validate_bounds(0, 255))
     """
@@ -201,8 +201,8 @@ class Crosshair:
     """
 
     @property
-    def cs2_commands(self) -> list[str]:
-        """List of commands to apply this crosshair in CS2."""
+    def commands(self) -> list[str]:
+        """List of commands to apply this crosshair."""
 
         return [
             f'cl_crosshair_drawoutline {self.draw_outline}',
