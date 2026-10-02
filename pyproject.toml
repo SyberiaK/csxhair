@@ -31,6 +31,9 @@ dynamic = ["version"]
 Homepage = "https://github.com/SyberiaK/csxhair"
 Issues = "https://github.com/SyberiaK/csxhair/issues"
 
+[project.optional-dependencies]
+dev = ["pytest>=9.1.1"]
+
 [tool.setuptools.dynamic]
 version = {attr = "csxhair.__version__"}
 
