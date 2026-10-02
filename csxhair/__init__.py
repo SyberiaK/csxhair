@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import IntEnum
 from re import compile as re_compile
 from sys import version_info
 
@@ -34,6 +35,25 @@ def _validate_bounds(lower_bound: int | float, upper_bound: int | float, /):
 
 def _round_float(_instance, _attribute, value: float) -> float:
     return round(value, 2)
+
+
+class Style(IntEnum):
+    DYNAMIC_CROSS = 0
+    DYNAMIC_CIRCLE = 1
+    DYNAMIC_CROSS_LEGACY = 2
+    STATIC_CIRCLE = 3
+    STATIC_CROSS = 4
+    STATIC_CROSS_SHOT_FEEDBACK = 5
+    DOT_ONLY = 6
+    DYNAMIC_QUAD = 7
+    STATIC_SQUARE = 8
+    STATIC_QUAD = 9
+
+
+class Outline(IntEnum):
+    NONE = 0
+    FULL = 1
+    HALF = 2
 
 
 @define
@@ -73,7 +93,7 @@ class Crosshair:
     Command: ``cl_crosshair_recoil``
     """
 
-    draw_outline: int = field(validator=_validate_bounds(0, 2))
+    draw_outline: Outline = field(converter=Outline, validator=_validate_bounds(0, 2))
     """
     Command: ``cl_crosshair_drawoutline``
 
@@ -150,7 +170,7 @@ class Crosshair:
     [0; 31]
     """
 
-    style: int = field(validator=_validate_bounds(0, 9))
+    style: Style = field(converter=Style, validator=_validate_bounds(0, 9))
     """
     Command: ``cl_crosshairstyle``
 
