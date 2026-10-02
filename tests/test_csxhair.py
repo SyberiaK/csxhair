@@ -69,6 +69,17 @@ def decode_check(code: str, expected: Crosshair):
     assert not mismatches, "Crosshair mismatch:\n" + "\n".join(mismatches)
 
 
+def encode_check(expected_code: str, x: Crosshair):
+    encoded = x.encode()
+
+    assert expected_code == encoded, f"Crosshair mismatch:\ncode: encoded={encoded!r}, expected={expected_code!r}"
+
+
 @pytest.mark.parametrize("n", range(1, N_CONFIGS + 1))
 def test_decode(n: int):
     decode_check(*read_data_from_files(n))
+
+
+@pytest.mark.parametrize("n", range(1, N_CONFIGS + 1))
+def test_encode(n: int):
+    encode_check(*read_data_from_files(n))
