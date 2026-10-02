@@ -5,15 +5,13 @@ from sys import version_info
 
 from attrs import Attribute, define, field
 
-
 __version__ = '2.0.0'
-__all__ = ('Crosshair',)
+__all__ = ['Crosshair']
 __author__ = 'SyberiaK <syberiakey@gmail.com>'
 
-DICTIONARY = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789'
-DICTIONARY_LENGTH = len(DICTIONARY)
-CODE_PATTERN = re_compile(r'CSGO(-[{%s}]{5}){5}$' % DICTIONARY)
-
+ALPHABET = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789'
+ALPHABET_LENGTH = len(ALPHABET)
+CODE_PATTERN = re_compile(r'CS[{%s}]{44}$' % ALPHABET)
 
 if version_info >= (3, 15):
     # noinspection PyUnresolvedReferences
@@ -22,39 +20,25 @@ else:
     to_bytes = bytes
 
 
-def signed_byte(x: int, /) -> int:
-    """Converts an unsigned byte to a signed one."""
-
-    return (x ^ 0x80) - 0x80  # https://stackoverflow.com/a/37095855
-
-
-def lowercase_bool(x: bool, /) -> str:
-    """For the sake of values unifying - returns a lowercase string of bool (``'True'`` -> ``'true'``)."""
-
-    if type(x) is bool:
-        return str(x).lower()
-
-    raise ValueError(f'Expected bool, got {x}')
+def _lower_bool(x: bool, /) -> str:
+    return str(x).lower()
 
 
 def _validate_bounds(lower_bound: int | float, upper_bound: int | float, /):
     def inner(_, attribute: Attribute, value: int):
         if not (lower_bound <= value <= upper_bound):
-            raise ValueError(f"'{attribute.name}' has to be in range [{lower_bound}; {upper_bound}].")
+            raise ValueError(f"'{attribute.name}' has to be in range [{lower_bound}; {upper_bound}] (found {value}).")
 
     return inner
+
+
+def _round_float(_instance, _attribute, value: float) -> float:
+    return round(value, 2)
 
 
 @define
 class Crosshair:
     """Represents a CS:GO/CS2 crosshair."""
-
-    gap: float = field(validator=_validate_bounds(-12.8, 12.7))
-    """
-    Command: ``cl_crosshair_gap``
-
-    [-12.8; 12.7]
-    """
 
     red: int = field(validator=_validate_bounds(0, 255))
     """
@@ -84,6 +68,46 @@ class Crosshair:
     [0; 255]
     """
 
+    recoil: bool = field(converter=bool)
+    """
+    Command: ``cl_crosshair_recoil``
+    """
+
+    draw_outline: int = field(validator=_validate_bounds(0, 2))
+    """
+    Command: ``cl_crosshair_drawoutline``
+
+    [0; 2]
+    """
+
+    outline_red: int = field(validator=_validate_bounds(0, 255))
+    """
+    Command: ``cl_crosshairoutline_r``
+
+    [0; 255]
+    """
+
+    outline_green: int = field(validator=_validate_bounds(0, 255))
+    """
+    Command: ``cl_crosshairoutline_g``
+
+    [0; 255]
+    """
+
+    outline_blue: int = field(validator=_validate_bounds(0, 255))
+    """
+    Command: ``cl_crosshairoutline_b``
+
+    [0; 255]
+    """
+
+    outline_alpha: int = field(validator=_validate_bounds(0, 255))
+    """
+    Command: ``cl_crosshairoutline_a``
+
+    [0; 255]
+    """
+
     dynamic_splitdist: int = field(validator=_validate_bounds(0, 127))
     """
     Command: ``cl_crosshair_dynamic_splitdist``
@@ -98,51 +122,39 @@ class Crosshair:
     [0; 255]
     """
 
-    recoil: bool = field(converter=bool)
-    """
-    Command: ``cl_crosshair_recoil``
-    """
-
-    draw_outline: int = field(validator=_validate_bounds(0, 2))
-    """
-    Command: ``cl_crosshair_drawoutline``
-
-    [0; 2]
-    """
-
-    dynamic_splitalpha_innermod: float = field(validator=_validate_bounds(0, 1))
+    dynamic_splitalpha_innermod: float = field(validator=_validate_bounds(0, 1), on_setattr=_round_float)
     """
     Command: ``cl_crosshair_dynamic_splitalpha_innermod``
 
-    [0.0; 1.0]
+    [0.00; 1.00]
     """
 
-    dynamic_splitalpha_outermod: float = field(validator=_validate_bounds(0.3, 1))
+    dynamic_splitalpha_outermod: float = field(validator=_validate_bounds(0.3, 1), on_setattr=_round_float)
     """
     Command: ``cl_crosshair_dynamic_splitalpha_outermod``
 
-    [0.3; 1.0]
+    [0.30; 1.00]
     """
 
-    dynamic_maxdist_split_ratio: float = field(validator=_validate_bounds(0, 1))
+    dynamic_maxdist_split_ratio: float = field(validator=_validate_bounds(0, 1), on_setattr=_round_float)
     """
     Command: ``cl_crosshair_dynamic_maxdist_splitratio``
 
-    [0.0; 1.0]
+    [0.00; 1.00]
     """
 
     thickness: int = field(validator=_validate_bounds(0, 6.3))
     """
     Command: ``cl_crosshair_thickness``
 
-    [0; 32]
+    [0; 31]
     """
 
-    style: int = field(validator=_validate_bounds(0, 5))
+    style: int = field(validator=_validate_bounds(0, 9))
     """
     Command: ``cl_crosshairstyle``
 
-    [0; 5]
+    [0; 9]
     """
 
     dot: bool = field(converter=bool)
@@ -155,6 +167,13 @@ class Crosshair:
     Command: ``cl_crosshair_t``
     """
 
+    gap: int = field(validator=_validate_bounds(-3840, 3840))
+    """
+    Command: ``cl_crosshair_gap``
+
+    [-3840; 3840]
+    """
+
     length: int = field(validator=_validate_bounds(0, 255))
     """
     Command: ``cl_crosshair_length``
@@ -162,7 +181,19 @@ class Crosshair:
     [0; 255]
     """
 
-    _screen_height: int = 1080
+    ironsight_usecrosshaircolor: bool = field(converter=bool)
+    """
+    Command: ``cl_ironsight_usecrosshaircolor``
+    """
+
+    ironsight_dot_scale: float = field(validator=_validate_bounds(0.1, 2), on_setattr=_round_float)
+    """
+    Command: ``cl_ironsight_dot_scale``
+
+    [0.10; 2.00]
+    """
+
+    _screen_height: int = field(default=1080)
     """
     Stored in the crosshair code for compatibility sake.
     
@@ -174,47 +205,30 @@ class Crosshair:
         """List of commands to apply this crosshair in CS2."""
 
         return [
-            f'cl_crosshair_gap {self.gap}',
-            f'cl_crosshaircolor_r {self.red}',
-            f'cl_crosshaircolor_g {self.green}',
-            f'cl_crosshaircolor_b {self.blue}',
-            f'cl_crosshaircolor_a {self.alpha}',
-            f'cl_crosshair_dynamic_splitdist {self.dynamic_splitdist}',
-            f'cl_crosshair_dynamic_spread_limit {self.dynamic_spread_limit}',
-            f'cl_crosshair_recoil {lowercase_bool(self.recoil)}',
             f'cl_crosshair_drawoutline {self.draw_outline}',
+            f'cl_crosshair_dynamic_maxdist_splitratio {self.dynamic_maxdist_split_ratio}',
             f'cl_crosshair_dynamic_splitalpha_innermod {self.dynamic_splitalpha_innermod}',
             f'cl_crosshair_dynamic_splitalpha_outermod {self.dynamic_splitalpha_outermod}',
-            f'cl_crosshair_dynamic_maxdist_splitratio {self.dynamic_maxdist_split_ratio}',
-            f'cl_crosshairthickness {self.thickness}',
-            f'cl_crosshairstyle {self.style}',
-            f'cl_crosshairdot {lowercase_bool(self.dot)}',
-            f'cl_crosshair_t {lowercase_bool(self.t)}',
+            f'cl_crosshair_dynamic_splitdist {self.dynamic_splitdist}',
+            f'cl_crosshair_dynamic_spread_limit {self.dynamic_spread_limit}',
+            f'cl_crosshair_gap {self.gap}',
             f'cl_crosshair_length {self.length}'
+            f'cl_crosshair_recoil {_lower_bool(self.recoil)}',
+            f'cl_crosshair_t {_lower_bool(self.t)}',
+            f'cl_crosshair_thickness {self.thickness}',
+            f'cl_crosshaircolor_a {self.alpha}',
+            f'cl_crosshaircolor_b {self.blue}',
+            f'cl_crosshaircolor_g {self.green}',
+            f'cl_crosshaircolor_r {self.red}',
+            f'cl_crosshairdot {_lower_bool(self.dot)}',
+            f'cl_crosshairoutline_a {self.outline_alpha}',
+            f'cl_crosshairoutline_b {self.outline_blue}',
+            f'cl_crosshairoutline_g {self.outline_green}',
+            f'cl_crosshairoutline_r {self.outline_red}',
+            f'cl_crosshairstyle {self.style}',
+            f'cl_ironsight_usecrosshaircolor {_lower_bool(self.ironsight_usecrosshaircolor)}',
+            f'cl_ironsight_dot_scale {self.ironsight_dot_scale}'
         ]
-
-    @staticmethod
-    def decode_to_bytes(code: str) -> bytes:
-
-        if not CODE_PATTERN.match(code):
-            raise ValueError(f"{code!r} doesn't match the pattern.")
-
-        chars = code[5:].replace('-', '')
-
-        num = 0
-        for c in reversed(chars):
-            num = num * DICTIONARY_LENGTH + DICTIONARY.index(c)
-
-        hexnum = hex(num)[2:].zfill(36)
-        try:
-            _bytes = bytes.fromhex(hexnum)
-        except ValueError:
-            raise ValueError(f'Invalid crosshair code: {code!r}.')
-
-        if _bytes[0] != sum(_bytes[1:]) % 256:
-            raise ValueError(f'Invalid crosshair code: {code!r}.')
-
-        return _bytes
 
     @staticmethod
     def decode(code: str) -> Crosshair:
@@ -235,13 +249,13 @@ class Crosshair:
         if not CODE_PATTERN.match(code):
             raise ValueError(f"{code!r} doesn't match the pattern.")
 
-        chars = code[5:].replace('-', '')
+        chars = code[2:]
 
         num = 0
         for c in reversed(chars):
-            num = num * DICTIONARY_LENGTH + DICTIONARY.index(c)
+            num = num * ALPHABET_LENGTH + ALPHABET.index(c)
 
-        hexnum = hex(num)[2:].zfill(36)
+        hexnum = hex(num)[2:].zfill(64)
         try:
             _bytes = bytes.fromhex(hexnum)
         except ValueError:
@@ -256,25 +270,33 @@ class Crosshair:
 
     @staticmethod
     def _sort_bytes(_bytes):
+        dyn = int.from_bytes(_bytes[18:22], "little")
+
         return {
-            'style': _bytes[2] & 7,
-            'recoil': (_bytes[2] & 16) != 0,
-            'dot': (_bytes[2] & 64) != 0,
-            't': (_bytes[2] & 128) != 0,
-            'red': _bytes[3],
-            'green': _bytes[4],
-            'blue': _bytes[5],
-            'alpha': _bytes[6],
-            'gap': _bytes[7],
-            'length': _bytes[8],
-            'dynamic_spread_limit': _bytes[9],
-            'dynamic_splitdist': _bytes[10] & 127,
-            'dynamic_splitalpha_innermod': (_bytes[11] & 127) / 10,
-            'dynamic_splitalpha_outermod': 0.3 + (_bytes[11] >> 7) / 20,
-            'dynamic_maxdist_split_ratio': (_bytes[12] & 127) / 100,
-            'thickness': (_bytes[12] >> 7) | ((_bytes[13] & 15) << 1),
-            'draw_outline': (_bytes[13] >> 4) & 3,
-            '_screen_height': _bytes[2] | (_bytes[3] << 8)
+            'screen_height': _bytes[2] | (_bytes[3] << 8),
+            "style": _bytes[4] & 31,
+            "recoil": bool(_bytes[4] & 32),
+            "dot": bool(_bytes[4] & 64),
+            "t": bool(_bytes[4] & 128),
+            "red": _bytes[5],
+            "green": _bytes[6],
+            "blue": _bytes[7],
+            "alpha": _bytes[8],
+            "outline_red": _bytes[9],
+            "outline_green": _bytes[10],
+            "outline_blue": _bytes[11],
+            "outline_alpha": _bytes[12],
+            "thickness": _bytes[13] & 31,
+            "draw_outline": (_bytes[13] >> 6) & 3,
+            "gap": int.from_bytes(_bytes[14:16], "little", signed=True),
+            "length": _bytes[16],
+            "dynamic_spread_limit": _bytes[17] & 255,
+            "dynamic_splitdist": _bytes[18] & 127,
+            "dynamic_splitalpha_innermod": round(((dyn >> 7) & 127) / 100.0, 2),
+            "dynamic_splitalpha_outermod": round(((dyn >> 14) & 127) / 100.0 + 0.3, 2),
+            "dynamic_maxdist_split_ratio": round(((dyn >> 21) & 127) / 100.0, 2),
+            "ironsight_usecrosshaircolor": bool(_bytes[21] & 16),
+            "ironsight_dot_scale": 0.10 + _bytes[22] / 100,
         }
 
     def encode(self) -> str:
@@ -284,38 +306,56 @@ class Crosshair:
         Returns:
             A crosshair share code.
         """
+
         _bytes = self._get_bytes()
         num = int(_bytes.hex(), 16)
 
-        code = ''
-        for _ in range(25):
-            num, r = divmod(num, DICTIONARY_LENGTH)
-            code += DICTIONARY[r]
+        code = 'CS'
+        for _ in range(44):
+            num, r = divmod(num, ALPHABET_LENGTH)
+            code += ALPHABET[r]
 
-        return f'CSGO-{code[:5]}-{code[5:10]}-{code[10:15]}-{code[15:20]}-{code[20:]}'
+        return code
 
     def _get_bytes(self):
+        dyn = (
+                (self.dynamic_splitdist & 127)
+                | ((round(self.dynamic_splitalpha_innermod * 100) & 127) << 7)
+                | ((round((self.dynamic_splitalpha_outermod - 0.3) * 100) & 127) << 14)
+                | ((round(self.dynamic_maxdist_split_ratio * 100) & 127) << 21)
+        )
+
         bytes_array = bytearray([
             0,
-            3,
-            ((self.style & 7) | (self.recoil << 4) | (self.dot << 6) | (self.t << 7)),
+            1,
+            self._screen_height & 255,
+            (self._screen_height >> 8) & 255,
+            (self.style & 31) | (int(self.recoil) << 5) | (int(self.dot) << 6) | (int(self.t) << 7),
             self.red,
             self.green,
             self.blue,
             self.alpha,
-            self.gap,
+            self.outline_red,
+            self.outline_green,
+            self.outline_blue,
+            self.outline_alpha,
+            (self.thickness & 31) | ((self.draw_outline & 3) << 6),
+            *self.gap.to_bytes(2, "little", signed=True),
             self.length,
-            self.dynamic_spread_limit,
-            self.dynamic_splitdist & 127,
-            (int(self.dynamic_splitalpha_innermod * 10) & 127) |
-            ((int((self.dynamic_splitalpha_outermod - 0.3) * 20) & 1) << 7),
-            (int(self.dynamic_maxdist_split_ratio * 100) & 127) | ((self.thickness & 1) << 7),
-            ((self.thickness >> 1) & 15) | ((self.draw_outline & 3) << 4),
-            self._screen_height & 255,
-            (self._screen_height >> 8) & 255,
+            self.dynamic_spread_limit & 255,
+            *dyn.to_bytes(4, "little"),
+            round((self.ironsight_dot_scale - 0.10) * 100) & 255,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0,
             0,
         ])
-        bytes_array[0] = sum(bytes_array[1:]) & 128
+        bytes_array[21] |= int(self.ironsight_usecrosshaircolor) << 4
 
+        bytes_array[0] = sum(bytes_array[1:]) & 255
         return to_bytes(bytes_array)
