@@ -12,7 +12,8 @@ __author__ = 'SyberiaK <syberiakey@gmail.com>'
 
 ALPHABET = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789'
 ALPHABET_LENGTH = len(ALPHABET)
-CODE_PATTERN = re_compile(r'CS[{%s}]{44}$' % ALPHABET)
+CODE_LENGTH = 44
+CODE_PATTERN = re_compile(r'CS[{%s}]{%d}$' % (ALPHABET, CODE_LENGTH))
 
 ColorInput = tuple[int, int, int] | tuple[int, int, int, int] | str
 
@@ -388,11 +389,10 @@ class Crosshair:
             A crosshair share code.
         """
 
-        _bytes = self._get_bytes()
-        num = int(_bytes.hex(), 16)
+        num = int.from_bytes(self._get_bytes(), "big")
 
         code = 'CS'
-        for _ in range(44):
+        for _ in range(CODE_LENGTH):
             num, r = divmod(num, ALPHABET_LENGTH)
             code += ALPHABET[r]
 
@@ -400,17 +400,16 @@ class Crosshair:
 
     def _get_bytes(self):
         dyn = (
-                (self.dynamic_splitdist & 127)
-                | ((round(self.dynamic_splitalpha_innermod * 100) & 127) << 7)
-                | ((round((self.dynamic_splitalpha_outermod - 0.3) * 100) & 127) << 14)
-                | ((round(self.dynamic_maxdist_split_ratio * 100) & 127) << 21)
+            (self.dynamic_splitdist & 127) |
+            ((round(self.dynamic_splitalpha_innermod * 100) & 127) << 7) |
+            ((round((self.dynamic_splitalpha_outermod - 0.3) * 100) & 127) << 14) |
+            ((round(self.dynamic_maxdist_split_ratio * 100) & 127) << 21)
         )
 
         bytes_array = bytearray([
             0,
             1,
-            self._screen_height & 255,
-            (self._screen_height >> 8) & 255,
+            *self._screen_height.to_bytes(2, "little"),
             (self.style & 31) | (int(self.recoil) << 5) | (int(self.dot) << 6) | (int(self.t) << 7),
             self.red,
             self.green,
