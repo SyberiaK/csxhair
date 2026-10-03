@@ -10,11 +10,11 @@ authors = [
 description = "Decode, edit and encode CS2 crosshairs easily."
 requires-python = ">=3.10"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
     "Development Status :: 6 - Mature",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -34,6 +34,9 @@ Issues = "https://github.com/SyberiaK/csxhair/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=9.1.1"]
+
+[tool.setuptools.packages.find]
+include = ["csxhair"]
 
 [tool.setuptools.dynamic]
 version = {attr = "csxhair.__version__"}
