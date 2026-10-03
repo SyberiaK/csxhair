@@ -318,7 +318,7 @@ class Crosshair:
             f'cl_crosshair_dynamic_splitdist {self.dynamic_splitdist}',
             f'cl_crosshair_dynamic_spread_limit {self.dynamic_spread_limit}',
             f'cl_crosshair_gap {self.gap}',
-            f'cl_crosshair_length {self.length}'
+            f'cl_crosshair_length {self.length}',
             f'cl_crosshair_recoil {_lower_bool(self.recoil)}',
             f'cl_crosshair_t {_lower_bool(self.t)}',
             f'cl_crosshair_thickness {self.thickness}',

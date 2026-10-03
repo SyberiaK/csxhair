@@ -83,3 +83,21 @@ def test_decode(n: int):
 @pytest.mark.parametrize("n", range(1, N_CONFIGS + 1))
 def test_encode(n: int):
     encode_check(*read_data_from_files(n))
+
+
+@pytest.mark.parametrize("n", range(1, N_CONFIGS + 1))
+def test_convars(n: int):
+    code, x = read_data_from_files(n)
+
+    convars = x.convars
+
+    assert all(len(c.split()) == 2 for c in convars), (
+        "every convar must have exactly two parts:\n"
+        + "\n".join(c for c in convars if len(c.split()) != 2)
+    )
+
+    assert len(convars) == len(CONVARS_TO_PARAMS)
+    assert len({c.split()[0] for c in convars}) == len(convars)
+
+    params = {CONVARS_TO_PARAMS[c.split()[0]]: safe_eval(c.split()[1]) for c in convars}
+    assert Crosshair(**params) == Crosshair.decode(code)
