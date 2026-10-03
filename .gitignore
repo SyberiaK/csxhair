@@ -7,3 +7,4 @@ venv/
 .idea/
 build/
 dist/
+playground/
