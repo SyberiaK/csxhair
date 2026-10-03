@@ -16,13 +16,16 @@ CSXhair is a simple package for decoding, changing and encoding CS2 crosshairs u
 from csxhair import Crosshair
 
 my_crosshair = Crosshair.decode('CSjNcfcGjo8LLy2pDpCynr5e5efCGW6yXuf7B6aQ7wkWmU')
-print(my_crosshair.gap)  # 2
+print(my_crosshair.gap)  #> 2
 
 my_crosshair.length += 5
 my_crosshair.recoil = True
-print(my_crosshair.encode())  # CSpQo2QSOSE2jXKTFHKei7T4mK5fznKeT2ziT8qXK9uN3Z
+print(my_crosshair.encode())  #> "CSpQo2QSOSE2jXKTFHKei7T4mK5fznKeT2ziT8qXK9uN3Z"
 
-print(my_crosshair.commands) # ['cl_crosshair_drawoutline 0', ..., 'cl_ironsight_usecrosshaircolor true', 'cl_ironsight_dot_scale 1.0']
+my_crosshair.color = "#00FFFF"  # alpha is set to 255
+my_crosshair.outline_color = (48, 57, 68, 128)
+
+print(my_crosshair.commands) #> ['cl_crosshair_drawoutline 0', ..., 'cl_ironsight_usecrosshaircolor true', 'cl_ironsight_dot_scale 1.0']
 ```
 
 *Special thanks to [Aquarius](https://github.com/aquaismissing) for making a rough implementation led to this package.*
