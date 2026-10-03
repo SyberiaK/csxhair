@@ -283,8 +283,8 @@ class Crosshair:
         self.outline_red, self.outline_green, self.outline_blue, self.outline_alpha = _parse_color(value)
 
     @property
-    def commands(self) -> list[str]:
-        """List of commands to apply this crosshair."""
+    def convars(self) -> list[str]:
+        """List of CS2's console variables to apply this crosshair."""
 
         return [
             f'cl_crosshair_drawoutline {self.draw_outline}',
