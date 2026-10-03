@@ -14,6 +14,8 @@ ALPHABET = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789'
 ALPHABET_LENGTH = len(ALPHABET)
 CODE_PATTERN = re_compile(r'CS[{%s}]{44}$' % ALPHABET)
 
+ColorInput = tuple[int, int, int] | tuple[int, int, int, int] | str
+
 if version_info >= (3, 15):
     # noinspection PyUnresolvedReferences
     to_bytes = bytearray.take_bytes  # doesn't do a copy
@@ -23,6 +25,49 @@ else:
 
 def _lower_bool(x: bool, /) -> str:
     return str(x).lower()
+
+
+def _hex_to_rgba(color: str) -> tuple[int, int, int, int]:
+    if not isinstance(color, str):
+        raise ValueError("Color must be a string")
+
+    color = color.removeprefix("#")
+
+    try:
+        if len(color) == 3:
+            r, g, b = (int(c * 2, 16) for c in color)
+            return r, g, b, 255
+        if len(color) == 6:
+            r, g, b = (
+                int(color[i:i + 2], 16)
+                for i in (0, 2, 4)
+            )
+            return r, g, b, 255
+        if len(color) == 8:
+            r, g, b, a = (
+                int(color[i:i + 2], 16)
+                for i in (0, 2, 4, 6)
+            )
+            return r, g, b, a
+
+        raise ValueError
+    except ValueError:
+        raise ValueError(f"Invalid HEX code: {color!r}") from None
+
+
+def _parse_color(value: ColorInput) -> tuple[int, int, int, int]:
+    if isinstance(value, tuple):
+        if len(value) == 4:
+            return value
+        if len(value) == 3:
+            r, g, b = value
+            return r, g, b, 255
+        raise ValueError(f"'{value}' is not a valid color.")
+
+    if isinstance(value, str):
+        return _hex_to_rgba(value)
+
+    raise ValueError(f"'{value}' is not a valid color.")
 
 
 def _validate_bounds(lower_bound: int | float, upper_bound: int | float, /):
@@ -219,6 +264,22 @@ class Crosshair:
     
     In most cases, it really just produces different sharecodes for the same crosshair.
     """
+
+    @property
+    def color(self) -> tuple[int, int, int, int]:
+        return self.red, self.green, self.blue, self.alpha
+
+    @color.setter
+    def color(self, value: ColorInput):
+        self.red, self.green, self.blue, self.alpha = _parse_color(value)
+
+    @property
+    def outline_color(self) -> tuple[int, int, int, int]:
+        return self.outline_red, self.outline_green, self.outline_blue, self.outline_alpha
+
+    @outline_color.setter
+    def outline_color(self, value: ColorInput):
+        self.outline_red, self.outline_green, self.outline_blue, self.outline_alpha = _parse_color(value)
 
     @property
     def commands(self) -> list[str]:
