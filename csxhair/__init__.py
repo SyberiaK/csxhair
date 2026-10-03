@@ -108,153 +108,153 @@ class Crosshair:
 
     red: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshaircolor_r``
+    ConVar: ``cl_crosshaircolor_r``
 
     [0; 255]
     """
 
     green: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshaircolor_g``
+    ConVar: ``cl_crosshaircolor_g``
 
     [0; 255]
     """
 
     blue: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshaircolor_b``
+    ConVar: ``cl_crosshaircolor_b``
 
     [0; 255]
     """
 
     alpha: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshaircolor_a``
+    ConVar: ``cl_crosshaircolor_a``
 
     [0; 255]
     """
 
     recoil: bool = field(converter=bool)
     """
-    Command: ``cl_crosshair_recoil``
+    ConVar: ``cl_crosshair_recoil``
     """
 
     draw_outline: Outline = field(converter=Outline, validator=_validate_bounds(0, 2))
     """
-    Command: ``cl_crosshair_drawoutline``
+    ConVar: ``cl_crosshair_drawoutline``
 
     [0; 2]
     """
 
     outline_red: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshairoutline_r``
+    ConVar: ``cl_crosshairoutline_r``
 
     [0; 255]
     """
 
     outline_green: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshairoutline_g``
+    ConVar: ``cl_crosshairoutline_g``
 
     [0; 255]
     """
 
     outline_blue: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshairoutline_b``
+    ConVar: ``cl_crosshairoutline_b``
 
     [0; 255]
     """
 
     outline_alpha: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshairoutline_a``
+    ConVar: ``cl_crosshairoutline_a``
 
     [0; 255]
     """
 
     dynamic_splitdist: int = field(validator=_validate_bounds(0, 127))
     """
-    Command: ``cl_crosshair_dynamic_splitdist``
+    ConVar: ``cl_crosshair_dynamic_splitdist``
 
     [0; 127]
     """
 
     dynamic_spread_limit: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshair_dynamic_spread_limit``
+    ConVar: ``cl_crosshair_dynamic_spread_limit``
 
     [0; 255]
     """
 
     dynamic_splitalpha_innermod: float = field(validator=_validate_bounds(0, 1), on_setattr=_round_float)
     """
-    Command: ``cl_crosshair_dynamic_splitalpha_innermod``
+    ConVar: ``cl_crosshair_dynamic_splitalpha_innermod``
 
     [0.00; 1.00]
     """
 
     dynamic_splitalpha_outermod: float = field(validator=_validate_bounds(0.3, 1), on_setattr=_round_float)
     """
-    Command: ``cl_crosshair_dynamic_splitalpha_outermod``
+    ConVar: ``cl_crosshair_dynamic_splitalpha_outermod``
 
     [0.30; 1.00]
     """
 
     dynamic_maxdist_split_ratio: float = field(validator=_validate_bounds(0, 1), on_setattr=_round_float)
     """
-    Command: ``cl_crosshair_dynamic_maxdist_splitratio``
+    ConVar: ``cl_crosshair_dynamic_maxdist_splitratio``
 
     [0.00; 1.00]
     """
 
     thickness: int = field(validator=_validate_bounds(0, 6.3))
     """
-    Command: ``cl_crosshair_thickness``
+    ConVar: ``cl_crosshair_thickness``
 
     [0; 31]
     """
 
     style: Style = field(converter=Style, validator=_validate_bounds(0, 9))
     """
-    Command: ``cl_crosshairstyle``
+    ConVar: ``cl_crosshairstyle``
 
     [0; 9]
     """
 
     dot: bool = field(converter=bool)
     """
-    Command: ``cl_crosshairdot``
+    ConVar: ``cl_crosshairdot``
     """
 
     t: bool = field(converter=bool)
     """
-    Command: ``cl_crosshair_t``
+    ConVar: ``cl_crosshair_t``
     """
 
     gap: int = field(validator=_validate_bounds(-3840, 3840))
     """
-    Command: ``cl_crosshair_gap``
+    ConVar: ``cl_crosshair_gap``
 
     [-3840; 3840]
     """
 
     length: int = field(validator=_validate_bounds(0, 255))
     """
-    Command: ``cl_crosshair_length``
+    ConVar: ``cl_crosshair_length``
 
     [0; 255]
     """
 
     ironsight_usecrosshaircolor: bool = field(converter=bool)
     """
-    Command: ``cl_ironsight_usecrosshaircolor``
+    ConVar: ``cl_ironsight_usecrosshaircolor``
     """
 
     ironsight_dot_scale: float = field(validator=_validate_bounds(0.1, 2), on_setattr=_round_float)
     """
-    Command: ``cl_ironsight_dot_scale``
+    ConVar: ``cl_ironsight_dot_scale``
 
     [0.10; 2.00]
     """
@@ -263,7 +263,7 @@ class Crosshair:
     """
     Stored in the crosshair code for compatibility sake.
     
-    In most cases, it really just produces different sharecodes for the same crosshair.
+    In most cases, it really just produces different share codes for the same crosshair.
     """
 
     @property
@@ -271,7 +271,19 @@ class Crosshair:
         return self.red, self.green, self.blue, self.alpha
 
     @color.setter
-    def color(self, value: ColorInput):
+    def color(self, value: ColorInput, /):
+        """
+        Translates a passed value into crosshair's color properties.
+
+        The valid values are:
+        - ``tuple[int, int, int]``;
+        - ``tuple[int, int, int, int]``;
+        - ``str`` with a HEX code made with 3, 6 or 12 characters (e.g. ``"#fff"``, ``"#FAF0FAFF"``).
+
+        Raises:
+            ValueError: if the value can't be processed.
+        """
+
         self.red, self.green, self.blue, self.alpha = _parse_color(value)
 
     @property
@@ -279,7 +291,19 @@ class Crosshair:
         return self.outline_red, self.outline_green, self.outline_blue, self.outline_alpha
 
     @outline_color.setter
-    def outline_color(self, value: ColorInput):
+    def outline_color(self, value: ColorInput, /):
+        """
+        Translates a passed value into crosshair's outline color properties.
+
+        The valid values are:
+        - ``tuple[int, int, int]``;
+        - ``tuple[int, int, int, int]``;
+        - ``str`` with a HEX code made with 3, 6 or 12 characters (e.g. ``"#fff"``, ``"#FAF0FAFF"``).
+
+        Raises:
+            ValueError: if the value can't be processed.
+        """
+
         self.outline_red, self.outline_green, self.outline_blue, self.outline_alpha = _parse_color(value)
 
     @property
@@ -319,10 +343,10 @@ class Crosshair:
 
         Parameters:
             code (str):
-                a crosshair share code.
+                a crosshair share code (e.g. ``"CSjNcfcGjo8LLy2pDpCynr5e5efCGW6yXuf7B6aQ7wkWmU"``).
 
         Returns:
-            a Crosshair object assosiated with this code.
+            a Crosshair object constructed from this code.
 
         Raises:
             ValueError: if the code is invalid.
@@ -383,10 +407,10 @@ class Crosshair:
 
     def encode(self) -> str:
         """
-        Translates a Crosshair object into a crosshair share code.
+        Translates a Crosshair object into a share code.
 
         Returns:
-            A crosshair share code.
+            A crosshair share code (e.g. ``"CSjNcfcGjo8LLy2pDpCynr5e5efCGW6yXuf7B6aQ7wkWmU"``).
         """
 
         num = int.from_bytes(self._get_bytes(), "big")
