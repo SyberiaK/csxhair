@@ -8,7 +8,7 @@ authors = [
     {name = "SyberiaK"}
 ]
 description = "Decode, edit and encode CS2 crosshairs easily."
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = [
@@ -16,8 +16,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
