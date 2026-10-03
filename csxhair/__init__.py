@@ -209,11 +209,11 @@ class Crosshair:
     [0.00; 1.00]
     """
 
-    thickness: int = field(validator=_validate_bounds(0, 6.3))
+    thickness: int = field(validator=_validate_bounds(0, 32))
     """
     ConVar: ``cl_crosshair_thickness``
 
-    [0; 31]
+    [0; 32]
     """
 
     style: Style = field(converter=Style, validator=_validate_bounds(0, 9))
